@@ -7,10 +7,15 @@ import imutils
 import units
 import os
 from io import BytesIO
+from redis_uits import RedisClient 
+import json
 
-
+#  pip  installed redis-4.5.5
 
 blueprint = Blueprint("routes", __name__)
+rc = RedisClient()
+
+MEMORY = True
 
 # 检测字典
 img_data = dict()
@@ -34,8 +39,18 @@ def initdate():
                  Returns:
                    void
     """
-    if img_data :
-        return jsonify({"status":200,"data": list(img_data.values())})
+    if MEMORY:
+        lists = []
+        data = rc.hgetall("img_data")
+        hash_dict = {}
+        for key, value in data.items():
+            lists.append(json.loads(value.decode('utf-8')))
+        data =  lists  
+    else:
+        data =   list(img_data.values())
+
+    if data :
+        return jsonify({"status":200,"data": data})
     else:
         return jsonify({"status":200,"message": "数据不存在"})
 
@@ -252,7 +267,11 @@ def upload_file():
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             img_id = units.get_uuid()
             req = {'img_name': f.filename, 'img_b64': file_content_b64, 'img_nparr': str(img),'id': img_id}
-            img_data[img_id] =req
+
+            if MEMORY :
+                rc.hset(key = "img_data", field = img_id, value = req)
+            else:
+                img_data[img_id] =req
         except Exception as e:
             print("图片上传失败", e)
 
@@ -283,6 +302,7 @@ def upload_file_analyze():
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             img_id = units.get_uuid()
             req = {'img_name': f.filename, 'img_b64': file_content_b64, 'img_nparr': str(img),'id': img_id}
+            rc.hset(key = "img_analyze", field = img_id, value = req)
             img_analyze[img_id] =req
             print(f"上传图片成功{f.filename}")
         except Exception as e:
@@ -318,6 +338,7 @@ def upload_file_url():
         if len(img_name) > 20:
             img_name=  img_name[0:20]
         req = {'img_name': img_name, 'img_b64': file_content_b64, 'img_nparr': str(img),'id': img_id}
+        rc.hset(key = "img_analyze", field = img_id, value = req)
         img_data[img_id] = req
     else:
        return jsonify({"status":100,"message": "非法的URL"})

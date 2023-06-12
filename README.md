@@ -1,5 +1,45 @@
 # deepface
 
+---
+
+
+```bash
+┌──[root@liruilongs.github.io]-[~]
+└─$ mkdir redis
+┌──[root@liruilongs.github.io]-[~]
+└─$ cd redis
+┌──[root@liruilongs.github.io]-[~/redis]
+└─$ mkdir -p ./mydata/redis/data
+┌──[root@liruilongs.github.io]-[~/redis]
+└─$ mkdir -p ./mydata/redis/conf
+┌──[root@liruilongs.github.io]-[~/redis]
+└─$ ls
+mydata  redis.conf
+┌──[root@liruilongs.github.io]-[~/redis]
+└─$ mv redis.conf ./mydata/redis/conf/
+
+```
+
+```bash
+┌──[root@liruilongs.github.io]-[~/redis/mydata/redis/conf]
+└─$ cat redis.conf
+protected-mode no
+appendonly yes
+requirepass 123456
+┌──[root@liruilongs.github.io]-[~/redis/mydata/redis/conf]
+└─$
+```
+
+```bash
+
+┌──[root@liruilongs.github.io]-[~/redis]
+└─$ docker run --name redis -p 6379:6379 -v $PWD/mydata/redis/data:/data -v $PWD/mydata/redis/conf/redis.conf:/etc/redis/redis.conf -d redis redis-server /etc/redis/redis.conf
+61f8d8ab6bae1f7ae7b9182c90ee052d6ce61d7d15bbfdffca653991a4181455
+```
+
+---
+
+
 <div align="center">
 
 [![PyPI Downloads](https://static.pepy.tech/personalized-badge/deepface?period=total&units=international_system&left_color=grey&right_color=blue&left_text=pypi%20downloads)](https://pepy.tech/project/deepface)
