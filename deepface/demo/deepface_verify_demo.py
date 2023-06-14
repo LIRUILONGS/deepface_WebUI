@@ -6,7 +6,7 @@
 @Author  :   Li Ruilong
 @Version :   1.0
 @Contact :   liruilonger@gmail.com
-@Desc    :   find 方法Demo 
+@Desc    :   verify 方法Demo 
 """
 
 # here put the import lib
