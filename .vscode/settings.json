@@ -6,8 +6,13 @@
   "editor.renderWhitespace": "all",
   "files.autoSave": "afterDelay",
   "python.analysis.typeCheckingMode": "basic",
-  "python.formatting.provider": "black",
+  "python.formatting.provider": "none",
   "python.formatting.blackArgs": ["--line-length=100"],
   "editor.fontWeight": "normal",
-  "python.analysis.extraPaths": ["./deepface"]
+  "python.analysis.extraPaths": [
+    "./deepface"
+  ],
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8"
+  }
 }

@@ -40,12 +40,8 @@ def initdate():
                    void
     """
     if MEMORY:
-        lists = []
-        data = rc.hgetall("img_data")
-        hash_dict = {}
-        for key, value in data.items():
-            lists.append(json.loads(value.decode('utf-8')))
-        data =  lists  
+        lists = rc.hgetall("img_data")
+        data = [json.loads(value.decode('utf-8')) for _ , value in lists.items()]
     else:
         data =   list(img_data.values())
 
@@ -128,15 +124,25 @@ def extract_faces_all():
     if img_id is None:
         return jsonify({"status":100,"message": "you must pass img_id input"})
     # 如果发生过解析直接返回
-    if img_id in img_data and 'img_b64_new' in img_data[img_id] :
-        return jsonify({"img_b64":img_data[img_id]['img_b64_new'],"res":img_data[img_id]['res'],"message":"以解析"})
-    img_b64 = img_data[img_id]['img_b64']
+    if MEMORY:
+        value =  rc.hget("img_data",img_id)
+        if value != None:
+            return jsonify({"img_b64":img_data[img_id]['img_b64_new'],"res":img_data[img_id]['res'],"message":"以解析"})
+    else:   
+        if img_id in img_data and 'img_b64_new' in img_data[img_id] :
+            return jsonify({"img_b64":img_data[img_id]['img_b64_new'],"res":img_data[img_id]['res'],"message":"以解析"})
+        
+    temp_dict =  img_data[img_id] 
+
+    img_b64 = temp_dict['img_b64']
     imgs = units.get_base64_to_img(img_b64)
     img,res,to_deepfaces = service.extract_faces_all(imgs)
     img_b64 =  units.get_img_to_base64(img)
-    img_data[img_id]['img_b64_new'] =img_b64
-    img_data[img_id]['res'] =str(res)
-    img_data[img_id]['imgs_details'] =to_deepfaces
+    temp_dict['img_b64_new'] =img_b64
+    temp_dict['res'] =str(res)
+    temp_dict['imgs_details'] =to_deepfaces
+    if MEMORY:
+       rc.hget("img_data",img_id) 
 
 
     return jsonify({"img_b64":img_b64,"res":str(res),"message":"解析成功"})
@@ -269,7 +275,7 @@ def upload_file():
             req = {'img_name': f.filename, 'img_b64': file_content_b64, 'img_nparr': str(img),'id': img_id}
 
             if MEMORY :
-                rc.hset(key = "img_data", field = img_id, value = req)
+                rc.hset(key = "img_data", field = img_id, value = json.dumps(req))
             else:
                 img_data[img_id] =req
         except Exception as e:
@@ -302,8 +308,10 @@ def upload_file_analyze():
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             img_id = units.get_uuid()
             req = {'img_name': f.filename, 'img_b64': file_content_b64, 'img_nparr': str(img),'id': img_id}
-            rc.hset(key = "img_analyze", field = img_id, value = req)
-            img_analyze[img_id] =req
+            if MEMORY :
+                rc.hset(key = "img_analyze", field = img_id, value = json.dumps(req))
+            else:
+                img_analyze[img_id] =req
             print(f"上传图片成功{f.filename}")
         except Exception as e:
             print("图片上传失败", e)
@@ -338,8 +346,10 @@ def upload_file_url():
         if len(img_name) > 20:
             img_name=  img_name[0:20]
         req = {'img_name': img_name, 'img_b64': file_content_b64, 'img_nparr': str(img),'id': img_id}
-        rc.hset(key = "img_analyze", field = img_id, value = req)
-        img_data[img_id] = req
+        if MEMORY :
+                rc.hset(key = "img_data", field = img_id, value = json.dumps(req))
+        else:
+                img_data[img_id] =req
     else:
        return jsonify({"status":100,"message": "非法的URL"})
 
@@ -374,7 +384,10 @@ def upload_file_url_analyze():
         if len(img_name) > 20:
             img_name=  img_name[0:20]
         req = {'img_name': img_name, 'img_b64': file_content_b64, 'img_nparr': str(img),'id': img_id}
-        img_analyze[img_id] = req
+        if MEMORY :
+                rc.hset(key = "img_analyze", field = img_id, value = json.dumps(req))
+        else:
+                img_analyze[img_id] =req
     else:
        return jsonify({"status":100,"message": "非法的URL"})
 
@@ -389,7 +402,10 @@ def handle_del():
     img_id = request.args.get("img_id")
     if img_id is None:
         return {"status":100,"message": "you must pass img_id input"}
-    del img_data[img_id]
+    if MEMORY:
+        rc.hdel("img_data",img_id)
+    else:
+        del img_data[img_id]
     return jsonify({"status":200,"message": "删除成功"})
 
 @blueprint.route("/handle_del_analyze", methods=["GET"])
@@ -400,7 +416,10 @@ def handle_del_analyze():
     img_id = request.args.get("img_id")
     if img_id is None:
         return {"status":100,"message": "you must pass img_id input"}
-    del img_analyze[img_id]
+    if MEMORY:
+        rc.hdel("img_analyze",img_id)
+    else:
+        del img_analyze[img_id]
     return jsonify({"status":200,"message": "删除成功"})
 
 @blueprint.route("/represent", methods=["POST"])

@@ -138,9 +138,9 @@ def extract_faces_all(img_path):
                     temp_img = "find false"
                    
                 if boo :
-                    cv2.imwrite('temp\\new_' +temp_img +"_"+ str(uuid.uuid4()).replace('-', '') + ".jpg", img_m[0])
+                    cv2.imwrite('temp\\sface\\new_' +temp_img +"_"+ str(uuid.uuid4()).replace('-', '') + ".jpg", img_m[0])
                 else:
-                    cv2.imwrite('temp\\new_' +temp_img +"_"+ str(uuid.uuid4()).replace('-', '') + ".jpg", img)
+                    cv2.imwrite('temp\\sface\\new_' +temp_img +"_"+ str(uuid.uuid4()).replace('-', '') + ".jpg", img)
                 boo = False
 
             pass

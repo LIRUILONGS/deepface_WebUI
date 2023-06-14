@@ -7,7 +7,7 @@ class RedisClient:
 # 字符串
     def str_set(self, key, value):
         self.r.set(key, value)
-        return self
+        return self.r
 
     def str_get(self, key):
         return self.r.get(key)
@@ -15,17 +15,17 @@ class RedisClient:
 
     def delete(self, key):
         self.r.delete(key)
-        return self
+        return self.r
         
 # 列表
     def lpush(self, key, value):
         self.r.lpush(key, value)
-        return self
+        return self.r 
         
 
     def rpush(self, key, value):
         self.r.rpush(key, value)
-        return self
+        return self.r 
 
     def lrange(self, key, start, end):
         return self.r.lrange(key, start, end)
@@ -33,7 +33,7 @@ class RedisClient:
 # 集合
     def sadd(self, key, value):
         self.r.sadd(key, value)
-        return self
+        return self.r
 
     def smembers(self, key):
         return self.r.smembers(key)
@@ -41,10 +41,18 @@ class RedisClient:
 # 哈希表
     def hset(self, key, field, value):
         self.r.hset(key, field, value)
-        return self
+        return self.r
 
     def hget(self, key, field):
         return self.r.hget(key, field)
+    
+    def hdel(self, key, field,boo=False):
+        self.r.hdel(key, field)
+        if boo:
+            return self.r.hgetall(key)
+        else:
+            return self.r
+
 
     def hgetall(self, key):
         return self.r.hgetall(key)
@@ -52,7 +60,7 @@ class RedisClient:
 # 有序集合
     def zadd(self, key, score, member):
         self.r.zadd(key, {member: score})
-        return self
+        return self.r 
 
     def zrange(self, key, start, end):
         return self.r.zrange(key, start, end)
