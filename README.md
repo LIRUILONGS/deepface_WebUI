@@ -36,6 +36,13 @@ requirepass 123456
 └─$ docker run --name redis -p 6379:6379 -v $PWD/mydata/redis/data:/data -v $PWD/mydata/redis/conf/redis.conf:/etc/redis/redis.conf -d redis redis-server /etc/redis/redis.conf
 61f8d8ab6bae1f7ae7b9182c90ee052d6ce61d7d15bbfdffca653991a4181455
 ```
+```bash
+┌──[root@liruilongs.github.io]-[~/redis/mydata]
+└─$ mkdir redisinsight
+┌──[root@liruilongs.github.io]-[~/redis/mydata]
+└─$ docker run -d  --name redisinsight -v $PWD/mydata/redisinsight/:/db -p 8001:8001 -u root redislabs/redisinsight:latest
+```
+
 
 ---
 

@@ -27,7 +27,6 @@ import uuid
 
 
 
-model = DeepFace.build_model("Facenet")
 
 
 
@@ -63,7 +62,7 @@ def extract_faces_all(img_path):
         rst = DeepFace.extract_faces(
             img_path=image,
             target_size=(224, 224),
-            detector_backend="mtcnn",
+            detector_backend="dlib",
             enforce_detection=True,
             align=True,
             grayscale=False)
@@ -72,7 +71,7 @@ def extract_faces_all(img_path):
         print("解析错误的图片：",img_path)
         file_name = os.path.basename(img_path)
 
-        cv2.imwrite("C:\putot\\"+file_name, image)
+        #cv2.imwrite("C:\putot\\"+file_name, image)
         print("保存解析错误的图：","C:\putot\\"+file_name)
         return
 
